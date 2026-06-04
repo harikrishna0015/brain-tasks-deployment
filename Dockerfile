@@ -1,4 +1,4 @@
-FROM nginx:alpine
+FROM public.ecr.aws/nginx/nginx:stable-alpine
 
 COPY dist/ /usr/share/nginx/html/
 
