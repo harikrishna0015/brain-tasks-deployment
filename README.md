@@ -1,92 +1,305 @@
-DevOps Practice Project – Dist Directory
+# Brain Tasks Application Deployment
 
-This repository contains the production-ready build files (dist folder) for DevOps practice and deployment exercises.
+## Project Overview
 
-It is intentionally structured to help learners focus on CI/CD pipelines, hosting, containerization, and infrastructure setup rather than application development.
+This project demonstrates a complete CI/CD pipeline for deploying the Brain Tasks application using Docker, Amazon ECR, Amazon EKS, AWS CodeBuild, AWS CodePipeline, Kubernetes, and CloudWatch.
 
-📁 What This Repository Contains
+The application was containerized, pushed to Amazon ECR, deployed to Amazon EKS, and automated through AWS CodePipeline.
 
-dist/ – Compiled and production-ready static files
+---
 
-HTML
+# Architecture
 
-CSS
+GitHub Repository
 
-JavaScript
+↓
 
-Assets (images, fonts, etc.)
+AWS CodePipeline
 
-These files are ready to deploy to:
+↓
 
-Web servers (Nginx / Apache)
+AWS CodeBuild
 
-Cloud platforms (AWS S3, Azure Blob, GCP Storage)
+↓
 
-Containerized environments (Docker + Nginx)
+Amazon ECR
 
-Kubernetes clusters
+↓
 
-CI/CD pipeline demonstrations
+Amazon EKS
 
-🎯 Purpose of This Repository
+↓
 
-This repository is designed for:
+Kubernetes Service (LoadBalancer)
 
-DevOps beginners
+↓
 
-CI/CD practice
+Brain Tasks Application
 
-Deployment pipeline testing
+---
 
-Docker & Kubernetes deployment exercises
+# Technologies Used
 
-Web server configuration practice
+* AWS EC2
+* Docker
+* Amazon ECR
+* Amazon EKS
+* Kubernetes
+* AWS CodeBuild
+* AWS CodePipeline
+* Amazon CloudWatch
+* GitHub
 
-Reverse proxy and load balancer setup
+---
 
-The goal is to simulate real-world deployment scenarios using already built application files.
+# AWS Environment
 
-❓ Why is there NO package.json?
+### AWS Account ID
 
-You may notice that this repository does not include:
+053849129210
 
-package.json
+### AWS Region
 
-node_modules
+us-east-1
 
-Source code (src/)
+### EKS Cluster
 
-Build tools configuration
+guvi-eks-cluster
 
-✅ Reason:
+### ECR Repository
 
-This repository only contains the final production build output (dist), not the development source code.
+brain-tasks-app
 
-In a typical project:
+---
 
-Developers write source code.
+# Source Code Repository
 
-The project is built using tools like:
+GitHub Repository:
 
-Node.js
+https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY
 
-Webpack
+---
 
-Vite
+# Docker Implementation
 
-React (or other frameworks)
+## Build Docker Image
 
-A dist/ folder is generated.
+```bash
+docker build -t brain-tasks-app .
+```
 
-Only the production build is deployed to servers.
+## Run Docker Container
 
-This repository represents step 4 only.
+```bash
+docker run -d --name brain-app -p 3000:80 brain-tasks-app
+```
 
-Since this is already the compiled output:
+## Verify Container
 
-No dependencies are required
+```bash
+docker ps
+```
 
-No build process is required
+---
 
-No package.json is needed
-Pipeline Test
+# Amazon ECR
+
+## Login to ECR
+
+```bash
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 053849129210.dkr.ecr.us-east-1.amazonaws.com
+```
+
+## Tag Image
+
+```bash
+docker tag brain-tasks-app:latest 053849129210.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app:latest
+```
+
+## Push Image
+
+```bash
+docker push 053849129210.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app:latest
+```
+
+---
+
+# Amazon EKS
+
+## Create Cluster
+
+```bash
+eksctl create cluster \
+--name guvi-eks-cluster \
+--region us-east-1 \
+--nodegroup-name workers \
+--nodes 2
+```
+
+## Verify Cluster
+
+```bash
+kubectl get nodes
+```
+
+Expected Output:
+
+Two worker nodes in Ready state.
+
+---
+
+# Kubernetes Deployment
+
+## Deployment Manifest
+
+deployment.yaml
+
+## Service Manifest
+
+service.yaml
+
+## Deploy Application
+
+```bash
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+```
+
+## Verify Pods
+
+```bash
+kubectl get pods
+```
+
+## Verify Deployment
+
+```bash
+kubectl get deployment
+```
+
+## Verify Service
+
+```bash
+kubectl get svc
+```
+
+---
+
+# CI/CD Pipeline
+
+## Source Stage
+
+GitHub Repository
+
+## Build Stage
+
+AWS CodeBuild
+
+Actions Performed:
+
+* Docker Image Build
+* Docker Image Tagging
+* Docker Image Push to ECR
+* Kubernetes Manifest Packaging
+
+## Deploy Stage
+
+Amazon EKS
+
+Actions Performed:
+
+* Kubernetes Authentication
+* Deployment Update
+* Service Validation
+
+---
+
+# Buildspec Configuration
+
+The buildspec.yml performs:
+
+1. Login to ECR
+2. Build Docker Image
+3. Tag Docker Image
+4. Push Image to ECR
+5. Publish deployment.yaml
+6. Publish service.yaml
+
+---
+
+# Monitoring
+
+Amazon CloudWatch Logs were enabled for:
+
+* CodeBuild Logs
+* CodePipeline Logs
+* Deployment Logs
+
+CloudWatch was used to monitor build and deployment activities.
+
+---
+
+# Application Access
+
+## Load Balancer Name
+
+a6f49483f767f4e87ab1f000e6acf273
+
+## Load Balancer DNS
+
+a6f49483f767f4e87ab1f000e6acf273-1355024068.us-east-1.elb.amazonaws.com
+
+## Application URL
+
+http://a6f49483f767f4e87ab1f000e6acf273-1355024068.us-east-1.elb.amazonaws.com
+
+---
+
+# Kubernetes Verification
+
+Commands Used:
+
+```bash
+kubectl get nodes
+kubectl get pods
+kubectl get deployment
+kubectl get svc
+```
+
+Results:
+
+* Nodes Status: Ready
+* Pods Status: Running
+* Deployment Status: Available
+* Service Type: LoadBalancer
+* Application Accessible Through Load Balancer
+
+---
+
+# Pipeline Verification
+
+CodePipeline Stages:
+
+✓ Source
+
+✓ Build
+
+✓ Deploy
+
+All stages completed successfully.
+
+---
+
+# Screenshots
+
+Please see in the screenshots folder
+
+---
+
+# Conclusion
+
+The Brain Tasks application was successfully containerized, stored in Amazon ECR, deployed to Amazon EKS, and automated using AWS CodePipeline and AWS CodeBuild. The application is accessible through a Kubernetes LoadBalancer and the entire deployment lifecycle is fully automated.
+
+ARN::
+
+a6f49483f767f4e87ab1f000e6acf273-1355024068.us-east-1.elb.amazonaws.com
